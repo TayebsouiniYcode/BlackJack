@@ -1,12 +1,26 @@
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Dealer extends Person{
+    private boolean gaming = true;
 
-    public ArrayList melangerCartes(ArrayList banqueCartes){
+    public boolean isGaming ( ) {
+        return gaming;
+    }
+
+    public void setGaming ( boolean gaming ) {
+        this.gaming = gaming;
+    }
+
+    public void showCartes() {
+        if(this.gaming){
+            System.out.println (this.cartes.get ( 0 ) );
+        } else {
+            System.out.println (this.cartes.toString () );
+        }
+    }
+
+    public void melangerCartes( ArrayList banqueCartes, Player player){
 
         ArrayList list = new ArrayList (  );
         for ( int i = 0 ; i < 52 ; i++ ) {
@@ -14,8 +28,6 @@ public class Dealer extends Person{
             banqueCartes.remove ( list.get ( 0 ) );
             banqueCartes.add ( list.get ( 0 ) );
         }
-
-        return banqueCartes;
     }
 
     public ArrayList tirerUneCarte(ArrayList banqueCartes){
@@ -46,7 +58,29 @@ public class Dealer extends Person{
     }
 
     public void hand(ArrayList banqueCartes, Player player){
+        playerPiocheCarte(banqueCartes, player);
+    }
+    public void dealerPiocheCarte(ArrayList banqueCartes){
+        while (getPoints () < 17){
+            this.cartes.add ( (Carte) banqueCartes.get ( 0 ) );
+            banqueCartes.remove ( 0 );
+        }
+        this.gaming = false;
+    }
 
+    public void deffausserCartes(Player player, Dealer dealer, ArrayList cartesDeffausser){
+        for ( Carte carte : player.getCartes ( ) ) {
+            cartesDeffausser.add ( carte );
+        }
+        for ( Carte carte : dealer.getCartes ( ) ) {
+            cartesDeffausser.add ( carte );
+        }
+    }
+
+    public void playerPiocheCarte(ArrayList<Carte> banqueCartes, Player player){
+        Carte carte = new Carte ( banqueCartes.get ( 0 ).getHauteur (), banqueCartes.get ( 0 ).getCouleur () );
+        banqueCartes.remove ( 0 );
+        player.setCarte(carte);
     }
 
     @Override
