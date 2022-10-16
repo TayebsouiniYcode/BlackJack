@@ -3,7 +3,7 @@ import java.util.Scanner;
 
 public class Player extends Person{
 
-    private double money = 5000;
+    private double money = 60000;
     private double bet;
 
     public double getBet ( ) {

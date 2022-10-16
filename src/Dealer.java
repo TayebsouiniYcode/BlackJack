@@ -33,7 +33,6 @@ public class Dealer extends Person{
     public ArrayList tirerUneCarte(ArrayList banqueCartes){
         Random random = new Random ( );
         int n = random.nextInt (52);
-
         return extraireUneCarte(banqueCartes, n);
     }
 
@@ -57,6 +56,13 @@ public class Dealer extends Person{
         banqueCartes.remove ( 0 );
     }
 
+    public void piocherAvecBlackJack(ArrayList banqueCartes, Player player){
+        this.cartes.add ( new Carte ( 1 ,1 ) );
+        player.cartes.add ( new Carte ( 1, 1 ) );
+        player.cartes.add ( new Carte ( 10, 1 ) );
+        this.cartes.add ( new Carte ( 2 ,1 ) );
+    }
+
     public void hand(ArrayList banqueCartes, Player player){
         playerPiocheCarte(banqueCartes, player);
     }
@@ -77,10 +83,22 @@ public class Dealer extends Person{
         }
     }
 
+    public void deffausser(ArrayList banqueCartes, ArrayList cartesDeffaussees, Player player){
+        banqueCartes.addAll ( cartesDeffaussees );
+        melangerCartes ( banqueCartes, player );
+    }
     public void playerPiocheCarte(ArrayList<Carte> banqueCartes, Player player){
         Carte carte = new Carte ( banqueCartes.get ( 0 ).getHauteur (), banqueCartes.get ( 0 ).getCouleur () );
         banqueCartes.remove ( 0 );
-        player.setCarte(carte);
+        if (carte.getHauteur () == 0 && carte.getCouleur () == 0){
+            Carte carte1 = new Carte ( banqueCartes.get ( 0 ).getHauteur (), banqueCartes.get ( 0 ).getCouleur () );
+            banqueCartes.remove ( 0 );
+            player.setCarte ( carte1 );
+            Game.redIsActive = !Game.redIsActive;
+        } else {
+            player.setCarte(carte);
+
+        }
     }
 
     @Override
