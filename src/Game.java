@@ -1,4 +1,6 @@
+import javax.swing.text.Caret;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Game {
@@ -7,105 +9,60 @@ public class Game {
     private ArrayList<Carte> cartesDeffausser = new ArrayList <Carte> (  );
     private Player player;
     Scanner scan = new Scanner ( System.in );
+    public static boolean redIsActive = false;
 
     public void begin () {
+        int choix;
+
         {
-            creerPlayer ();
             creerCartes ();
             this.dealer.melangerCartes ( this.banqueCartes, this.player );
+            setRedCard();
         }
 
-        int choix;
-        do {
-            System.out.println ("1. Enter the game" );
-            System.out.println ("2. Quitter" );
-            choix = scan.nextInt ();
-
-            switch (choix) {
-                case 1:
-                    System.out.println ("Money : " + player.getMoney () );
-                    System.out.println ("Enter a bet: " );
-                    System.out.println ("1. 500 \n2. 1000\n3. 3000" );
-                    int bet =  scan.nextInt ();
-                    switch (bet) {
-                        case 1:
-                            if ( this.player.setBet ( 500 ) )
-                                startGame ();
-                            break;
-                        case 2:
-                            if (this.player.setBet ( 1000 ))
-                                startGame ();
-                            break;
-                        case 3:
-                            if ( this.player.setBet ( 3000 ) )
-                                startGame ();
-                            break;
-                    }
-                    break;
-                case 2:
-                    break;
-                default:
-                    System.out.println ("Enter a valide number !!" );
-            }
-        } while (choix != 2);
-        /*
-        {
-            this.player.defineBet ();
-            this.dealer.piocher ( this.banqueCartes, this.player );
-        }
-        {
-            int choix = 0;
+        EnterTheGame: {
             do {
-                this.dealer.showCartes();
-                this.player.showCartes();
+                System.out.println ("1. Enter the game" );
+                System.out.println ("2. Quitter" );
+                choix = scan.nextInt ();
 
-                if(checkBlackJack ()){
-
-                } else {
-                    if (player.getPoints () > 21){
-                        System.out.println ("Your lost!!" );
-                        restart ();
-                    }
-                    if (player.getPoints () == 21){
-                        dealer.dealerPiocheCarte ( this.banqueCartes );
-                    }
-                    System.out.println ("1. Tirer une carte" );
-                    System.out.println ("2. Stand" );
-
-                    choix = scan.nextInt ();
-
-                    switch (choix){
-                        case 1:
-                            this.dealer.hand ( this.banqueCartes, this.player );
-                            break;
-                    }
-
+                switch (choix) {
+                    case 1:
+                        System.out.println ("Your money is : " + player.getMoney () );
+                        System.out.println ("Select a bet: " );
+                        System.out.println ("1. 500 \n2. 1000\n3. 3000" );
+                        int bet =  scan.nextInt ();
+                        switch (bet) {
+                            case 1:
+                                if ( this.player.setBet ( 500 ) )
+                                    startGame ();
+                                break;
+                            case 2:
+                                if (this.player.setBet ( 1000 ))
+                                    startGame ();
+                                break;
+                            case 3:
+                                if ( this.player.setBet ( 3000 ) )
+                                    startGame ();
+                                break;
+                        }
+                        break;
+                    case 2:
+                        break;
+                    default:
+                        System.out.println ("Enter a valide number !!" );
                 }
-
-            } while (this.dealer.isGaming ());
-            System.out.println ("dealer is false" );
-            player.showCartes ();
-            System.out.println ("point: " + player.getPoints ());
+            } while (choix != 2);
         }
-
-*/
-        //creerCartes ();
-        //dealer.melangerCartes(this.banqueCartes, this.player);
-        //dealer.piocher(banqueCartes, this.player);
-        //gameStat ();
-        //checkBlackJack ();
-
-
-
 
     }
 
     public void startGame() {
-        dealer.piocher ( banqueCartes, player );
-
         int choix;
+        dealer.piocher ( banqueCartes, player );
+        //dealer.piocherAvecBlackJack(banqueCartes, player);
         if (checkBlackJack ()) {
-
+           begin();
         } else {
             do {
                 dealer.showCartes ();
@@ -113,6 +70,8 @@ public class Game {
                 System.out.println ("your points : " + player.getPoints () );
                 System.out.println (  "\n\n\n\n\n");
                 if (player.getPoints () < 21){
+                    System.out.println ("Cartes trouver : " );
+                    afficherBanqueCartes ();
                     System.out.println ("1. Tirer une carte" );
                     System.out.println ("2. stand" );
                     choix = scan.nextInt ();
@@ -154,6 +113,10 @@ public class Game {
         this.cartesDeffausser.addAll ( this.dealer.getCartes () );
         this.player.resetCartes();
         this.dealer.resetCartes();
+
+        if (Game.redIsActive){
+            this.dealer.deffausser ( banqueCartes, cartesDeffausser, this.player );
+        }
     }
     public void equalGame() {
         System.out.println ("Equal" );
@@ -184,9 +147,11 @@ public class Game {
         this.player = new Player ();
         Scanner scan = new Scanner ( System.in);
         this.player.setName(scan.nextLine ());
+
+        begin ();
     }
 
-    public void gameStat() {
+    public void gameState() {
         System.out.println ("dealer carte : " +dealer.getCartes ().get ( 0 ).toString () );
         System.out.println (player.getName () + " cartes : " + player.getCartes () + " your Score : " +player.getPoints () );
     }
@@ -218,7 +183,18 @@ public class Game {
             } else if (player.getPoints () > dealer.getPoints ()){
                 winner ( true );
             }
+        }if (dealer.getPoints () > 21){
+            winner(true);
         }
+    }
+
+    public void setRedCard(){
+        Random rand = new Random();
+        //int n = rand.nextInt(26);
+        int result = rand.nextInt(45-26) + 26;
+        Carte carte = (Carte) this.banqueCartes.get ( result );
+        this.banqueCartes.add (result, new Carte ( 0, 0 )  );
+        this.banqueCartes.add ( carte );
     }
 
     public void restart() {

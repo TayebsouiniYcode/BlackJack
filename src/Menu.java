@@ -12,7 +12,7 @@ public class Menu {
             switch (choix) {
                 case 1:
                     Game game = new Game();
-                    game.begin ();
+                    game.creerPlayer ();
                     break;
             }
 
